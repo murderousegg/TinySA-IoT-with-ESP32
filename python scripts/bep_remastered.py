@@ -153,7 +153,7 @@ if __name__ == '__main__':
     client.subscribe(topicmain) #subscribe to topic where MAC addresses are posted
     client.subscribe("bep/main/interval")   #subscribe to topic where interval is updated
     client.loop_start() #start mqtt loop
-    client.publish("A", "restart")  #let running ESP32's know the program restarted
+    client.publish("BEP/main/restart", "restart")  #let running ESP32's know the program restarted
     time.sleep(1)   #give everything time to settle
     while 1:
         if len(input_topics) > 0:   #start as soon as a tinySA is discovered
