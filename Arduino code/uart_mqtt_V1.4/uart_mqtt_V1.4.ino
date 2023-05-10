@@ -99,7 +99,7 @@ void setup() {
   //subscribe to personal input topic
   mqttClient.subscribe(topicin);
   //subscribe to topic used for the restart command
-  mqttClient.subscribe("A");
+  mqttClient.subscribe("bep/main/reset");
   mqttClient.setBufferSize(20000);  //Set larger buffersize for large datastreams (little penalty on speed)
 }
 
