@@ -28,9 +28,10 @@ password = 'Zenfone8'
 userCmd = ""                    #variable to store last command
 df_frequencies = pd.DataFrame() #create df to store frequencies
 measurement_interval = 8        #set default measurement interval
+start = "false"
 
 #setup influxdb database
-influxclient = InfluxDBClient('131.155.161.195', 8086, 'mydb')  #check for updated ip adress!
+influxclient = InfluxDBClient('131.155.162.230', 8086, 'mydb')  #check for updated ip adress!
 influxclient.switch_database('mydb')
 
 #function to find out if something is a number to prevent errors
@@ -57,6 +58,7 @@ def connect_mqtt():
 
 #callback for when message is received
 def on_message(client, userdata, msg):
+    global start
     if msg.topic == topicmain:  #check if message is from main topic
         incomingMessage = msg.payload.decode("utf-8")
         if incomingMessage == "clear database":
@@ -67,6 +69,14 @@ def on_message(client, userdata, msg):
                 input_topics.append("bep/input_devices/" + incomingMessage)
                 print("found " + incomingMessage)
         time.sleep(1)
+        return
+    
+    if msg.topic == "bep/main/pause":
+        if msg.payload.decode("utf-8") == "paused":
+            return
+        else:
+            start = msg.payload.decode("utf-8")
+            print(start)
         return
         
     if msg.topic == "bep/main/interval":    #change measurement interval
@@ -84,14 +94,18 @@ def on_message(client, userdata, msg):
     ch = tempList.pop() #remove ch> from list
     json_payload = []   #create list to store dicts with data
     inputTopic = msg.topic.replace("output", "input")   #get correct input topic from output topic
-    if "sweep" in tempList[0]:  #measurement frequencies have changed
-        client.publish(inputTopic,"frequencies")    #update frequencies
-        time.sleep(1)   #extra sleep to prevent errors
+    try:
+        if "sweep" in tempList[0]:  #measurement frequencies have changed
+            client.publish(inputTopic,"frequencies")    #update frequencies
+            time.sleep(1)   #extra sleep to prevent errors
+            return
+    except:
+        print("message empty")
         return
         
     if "scan " in tempList[0]:  #got new measurements
         curtime = time.time_ns() #set timestamp for when measurements were retrieved
-        x = 1   #used for selecting frequency from dataframe
+        x = 0   #used for selecting frequency from dataframe
         for line in tempList[1:]:   #loop over results line by line
             splitString = line.split()  #split line to get gains
             xi = splitString[0] #store gain in xi
@@ -139,22 +153,32 @@ def animate():
     for i in input_topics:  #loop over tinySA's
         while i not in df_frequencies:  #check if the frequency range is known
             client.publish(i, "frequencies")    #update frequency range
-            time.sleep(1)   #safety sleep before sending commands too fast
+            time.sleep(2)   #safety sleep before sending commands too fast
     for i in input_topics:  #loop over tinySA's
         firstFrequency=df_frequencies[i].iloc[1]    #get start frequency
         lastFrequency=df_frequencies[i].iloc[-1]    #get stop frequency
-        self.send_command("scan %d %d 290 2" % (firstFrequency, lastFrequency), i)  #get scan results
+        client.publish(i, "scan " + str(firstFrequency) + " " + str(lastFrequency) + " 290 2")  #get scan results
     time.sleep(float(measurement_interval)) #interval between measurements, set by nodered
 
 if __name__ == '__main__':
     #setup process
+    print(start)
     client = connect_mqtt() #connect to mqtt
     client.on_message = on_message  #set callback for when message is received
     client.subscribe(topicmain) #subscribe to topic where MAC addresses are posted
     client.subscribe("bep/main/interval")   #subscribe to topic where interval is updated
+    client.subscribe("bep/main/pause")
     client.loop_start() #start mqtt loop
-    client.publish("bep/main/restart", "restart")  #let running ESP32's know the program restarted
+    client.publish("bep/main/restart", "restart") #let running ESP32's know the program restarted
     time.sleep(1)   #give everything time to settle
+    once = 0
     while 1:
-        if len(input_topics) > 0:   #start as soon as a tinySA is discovered
-            animate()
+        while start == "true":
+            if len(input_topics) > 0:   #start as soon as a tinySA is discovered
+                once = 0
+                animate()
+        while start == "false":
+            if once == 0:
+                client.publish("bep/main/paused", "paused")
+                once = 1
+                time.sleep(1)

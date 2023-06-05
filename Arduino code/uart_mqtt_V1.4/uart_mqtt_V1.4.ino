@@ -40,8 +40,8 @@ const char *mqtt_username = "Frank";
 const char *mqtt_password = "Zenfone8";
 const int mqtt_port = 1883;
 //WIFI credentials here
-const char *APName = "AndroidAP85af";
-const char *WIFIpsk = "kaqu2459";
+const char *APName = "iotroam";
+const char *WIFIpsk = "AlphaBeta69!";
 const int BUFFER_SIZE = 15000; //buffer for received messages
 char *restart = "restart";     //for when restart command is received
 int BAUDRATE = 460800;         //higher baudrate > faster update but also unstable
@@ -72,7 +72,6 @@ void setup() {
                 UART_TX_PIN);
   Serial1.setTimeout(2000);
   Serial.setTimeout(2000);
-  pinMode(40, OUTPUT);  //for debugging led
   WiFi.disconnect();
   delay(3000);                  //give time for wifi to start up
   WiFi.begin(APName, WIFIpsk);  //start up wifi with credentials
@@ -99,18 +98,20 @@ void setup() {
   //subscribe to personal input topic
   mqttClient.subscribe(topicin);
   //subscribe to topic used for the restart command
-  mqttClient.subscribe("bep/main/reset");
-  mqttClient.setBufferSize(20000);  //Set larger buffersize for large datastreams (little penalty on speed)
+  mqttClient.subscribe("bep/main/restart");
+  mqttClient.setBufferSize(14000);  //Set larger buffersize for large datastreams (little penalty on speed)
 }
 
 void loop() {
   mqttClient.loop();                 //keep listening on mqtt channel
   if (Serial1.available() > 1) {  //loop for publishing incoming data on rx pins to a topic
-    digitalWrite(40, 1);  //turn on debug led
+    neopixelWrite(RGB_BUILTIN,RGB_BRIGHTNESS,0,0); // Red
     //read bytes: beware that if your incoming data exceeds the buffer size you will probably receive weird data
     int rlen = Serial1.readBytesUntil('>', buf, BUFFER_SIZE); //read until tinySA asks for new command ('>' not included in buffer)
+    neopixelWrite(RGB_BUILTIN,0,RGB_BRIGHTNESS,0); // Green
     mqttClient.publish(topicout, buf, rlen);  //publish data to personal output topic
-    digitalWrite(40,0); //turn off debug led
+    neopixelWrite(RGB_BUILTIN,0,0,RGB_BRIGHTNESS); // Blue
     memset(buf, 0, sizeof(buf)); //make sure buffer is empty for next data
   }
+  digitalWrite(RGB_BUILTIN, LOW);    // Turn the RGB LED off
 }

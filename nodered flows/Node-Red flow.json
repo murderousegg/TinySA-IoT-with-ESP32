@@ -1,0 +1,769 @@
+[
+    {
+        "id": "e9950fb4a0b9271b",
+        "type": "tab",
+        "label": "Tinysa interaction",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "de9d2bae53940b0e",
+        "type": "ui_dropdown",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "select device",
+        "tooltip": "",
+        "place": "No device selected",
+        "group": "686c4c8ff06d22b8",
+        "order": 1,
+        "width": "14",
+        "height": "1",
+        "passthru": true,
+        "multiple": false,
+        "options": [],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 790,
+        "y": 480,
+        "wires": [
+            [
+                "33776a6ee65119fa"
+            ]
+        ]
+    },
+    {
+        "id": "091338ed24618b6a",
+        "type": "influxdb in",
+        "z": "e9950fb4a0b9271b",
+        "influxdb": "25b15afd81919975",
+        "name": "",
+        "query": "SHOW TAG VALUES FROM sweep WITH KEY=ticker",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "organisation",
+        "x": 350,
+        "y": 480,
+        "wires": [
+            [
+                "bfc1568f7ab39c6b"
+            ]
+        ]
+    },
+    {
+        "id": "bfc1568f7ab39c6b",
+        "type": "function",
+        "z": "e9950fb4a0b9271b",
+        "name": "device grabber",
+        "func": "var tempList = [];\nvar temp;\nfor(let i =0; i<msg.payload.length; i++){\n    temp = msg.payload[i].value;\n    tempList.push(temp);\n}\nmsg.options = tempList;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 480,
+        "wires": [
+            [
+                "de9d2bae53940b0e"
+            ]
+        ]
+    },
+    {
+        "id": "6e4062bf55621737",
+        "type": "ui_text_input",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Stop frequency",
+        "tooltip": "Enter to confirm",
+        "group": "686c4c8ff06d22b8",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 360,
+        "y": 600,
+        "wires": [
+            [
+                "4b77de342c15375e"
+            ]
+        ]
+    },
+    {
+        "id": "33776a6ee65119fa",
+        "type": "function",
+        "z": "e9950fb4a0b9271b",
+        "name": "function 2",
+        "func": "msg.topic = msg.payload;\nmsg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 140,
+        "y": 560,
+        "wires": [
+            [
+                "bab072bf77ed8a46",
+                "6e4062bf55621737",
+                "b0ba7c84e55bf5d6",
+                "63f783977560d02d",
+                "a4535ecad1d89af5",
+                "69748e484ab0bed9",
+                "41982cd80ae7f145"
+            ]
+        ]
+    },
+    {
+        "id": "bab072bf77ed8a46",
+        "type": "ui_text_input",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Start frequency",
+        "tooltip": "Enter to confirm",
+        "group": "686c4c8ff06d22b8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 360,
+        "y": 560,
+        "wires": [
+            [
+                "3080e27f9692a5b4"
+            ]
+        ]
+    },
+    {
+        "id": "b0ba7c84e55bf5d6",
+        "type": "ui_text_input",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "span",
+        "tooltip": "Enter to confirm",
+        "group": "686c4c8ff06d22b8",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 330,
+        "y": 640,
+        "wires": [
+            [
+                "447077a862f2700b"
+            ]
+        ]
+    },
+    {
+        "id": "3080e27f9692a5b4",
+        "type": "function",
+        "z": "e9950fb4a0b9271b",
+        "name": "start frequency",
+        "func": "msg.payload = \"sweep start \"+ msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 560,
+        "wires": [
+            [
+                "b36b5e1be5be825e"
+            ]
+        ]
+    },
+    {
+        "id": "4b77de342c15375e",
+        "type": "function",
+        "z": "e9950fb4a0b9271b",
+        "name": "stop frequency",
+        "func": "msg.payload = \"sweep stop \"+ msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 600,
+        "wires": [
+            [
+                "b36b5e1be5be825e"
+            ]
+        ]
+    },
+    {
+        "id": "447077a862f2700b",
+        "type": "function",
+        "z": "e9950fb4a0b9271b",
+        "name": "span frequency",
+        "func": "msg.payload = \"sweep span \"+ msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 640,
+        "wires": [
+            [
+                "b36b5e1be5be825e",
+                "9b8bdc31adba5885"
+            ]
+        ]
+    },
+    {
+        "id": "63f783977560d02d",
+        "type": "ui_text_input",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Custom command",
+        "tooltip": "Enter to confirm",
+        "group": "686c4c8ff06d22b8",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 370,
+        "y": 680,
+        "wires": [
+            [
+                "b36b5e1be5be825e",
+                "9b8bdc31adba5885"
+            ]
+        ]
+    },
+    {
+        "id": "c8d6cda37f97fd6e",
+        "type": "ui_button",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "group": "686c4c8ff06d22b8",
+        "order": 12,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Refresh list",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "refresh",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 150,
+        "y": 480,
+        "wires": [
+            [
+                "091338ed24618b6a"
+            ]
+        ]
+    },
+    {
+        "id": "a4535ecad1d89af5",
+        "type": "ui_dropdown",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Resolution bandwidth",
+        "tooltip": "",
+        "place": "Select rbw",
+        "group": "686c4c8ff06d22b8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "3kHz",
+                "value": "rbw 3",
+                "type": "str"
+            },
+            {
+                "label": "10kHz",
+                "value": "rbw 10",
+                "type": "str"
+            },
+            {
+                "label": "30kHz",
+                "value": "rbw 30",
+                "type": "str"
+            },
+            {
+                "label": "100kHz",
+                "value": "rbw 100",
+                "type": "str"
+            },
+            {
+                "label": "300kHz",
+                "value": "rbw 300",
+                "type": "str"
+            },
+            {
+                "label": "600kHz",
+                "value": "rbw 600",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 380,
+        "y": 720,
+        "wires": [
+            [
+                "b36b5e1be5be825e",
+                "9b8bdc31adba5885"
+            ]
+        ]
+    },
+    {
+        "id": "87d99f5690615216",
+        "type": "function",
+        "z": "e9950fb4a0b9271b",
+        "name": "Attentuate",
+        "func": "msg.payload = \"attenuate \"+ msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 800,
+        "wires": [
+            [
+                "b36b5e1be5be825e",
+                "9b8bdc31adba5885"
+            ]
+        ]
+    },
+    {
+        "id": "69748e484ab0bed9",
+        "type": "ui_text_input",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Attenuation [0-31]",
+        "tooltip": "Enter to confirm",
+        "group": "686c4c8ff06d22b8",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 370,
+        "y": 800,
+        "wires": [
+            [
+                "87d99f5690615216"
+            ]
+        ]
+    },
+    {
+        "id": "b8369c9621f8af32",
+        "type": "ui_slider",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Time between measurements [s]",
+        "tooltip": "",
+        "group": "686c4c8ff06d22b8",
+        "order": 9,
+        "width": "14",
+        "height": "1",
+        "passthru": true,
+        "outs": "end",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": "1",
+        "max": "20",
+        "step": "0.5",
+        "className": "",
+        "x": 390,
+        "y": 920,
+        "wires": [
+            [
+                "92bab632bc01a7b2"
+            ]
+        ]
+    },
+    {
+        "id": "92bab632bc01a7b2",
+        "type": "mqtt out",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "topic": "bep/main/interval",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "1d0b0ec39b5427ba",
+        "x": 810,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "41982cd80ae7f145",
+        "type": "ui_dropdown",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "set input/output mode",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "686c4c8ff06d22b8",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "low input",
+                "value": "mode low input",
+                "type": "str"
+            },
+            {
+                "label": "low output",
+                "value": "mode low output",
+                "type": "str"
+            },
+            {
+                "label": "high input",
+                "value": "mode high input",
+                "type": "str"
+            },
+            {
+                "label": "high output",
+                "value": "mode high output",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 380,
+        "y": 760,
+        "wires": [
+            [
+                "b36b5e1be5be825e",
+                "9b8bdc31adba5885"
+            ]
+        ]
+    },
+    {
+        "id": "a909c26ca2de09ab",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "Get list tinySA's",
+        "info": "",
+        "x": 160,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "64b2b21e31b63e74",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "Dropdown to select device",
+        "info": "",
+        "x": 1030,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "7c4bba218eec3798",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "set MQTT topic",
+        "info": "",
+        "x": 120,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "dae7cd44904a7075",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "Create inputs",
+        "info": "",
+        "x": 750,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "fb6da812b45ed00a",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "decrease interval",
+        "info": "Temporariliy decreases the measurement\ninterval to allow communication",
+        "x": 800,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "3dfd6c05f0449b28",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "change measurement interval",
+        "info": "",
+        "x": 400,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "ba6d5b95b9a38514",
+        "type": "ui_switch",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "label": "Pause switch",
+        "tooltip": "",
+        "group": "686c4c8ff06d22b8",
+        "order": 10,
+        "width": "9",
+        "height": "1",
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 350,
+        "y": 1040,
+        "wires": [
+            [
+                "642611bccac6e705"
+            ]
+        ]
+    },
+    {
+        "id": "642611bccac6e705",
+        "type": "mqtt out",
+        "z": "e9950fb4a0b9271b",
+        "name": "bep/main",
+        "topic": "bep/main/pause",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "1d0b0ec39b5427ba",
+        "x": 540,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "6ae4802.e40238",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "(optional) expired messages",
+        "info": "",
+        "x": 1000,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "29c48047ad183ef7",
+        "type": "mqtt out",
+        "z": "e9950fb4a0b9271b",
+        "name": "bep/main",
+        "topic": "bep/main/pause",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "1d0b0ec39b5427ba",
+        "x": 1040,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "b36b5e1be5be825e",
+        "type": "trigger",
+        "z": "e9950fb4a0b9271b",
+        "name": "",
+        "op1": "false",
+        "op2": "",
+        "op1type": "bool",
+        "op2type": "nul",
+        "duration": "250",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 860,
+        "y": 680,
+        "wires": [
+            [
+                "29c48047ad183ef7"
+            ]
+        ]
+    },
+    {
+        "id": "9b8bdc31adba5885",
+        "type": "link out",
+        "z": "e9950fb4a0b9271b",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "8ad46c3b021122bc"
+        ],
+        "x": 855,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "418585aa8aa169ca",
+        "type": "comment",
+        "z": "e9950fb4a0b9271b",
+        "name": "send to pause measurements",
+        "info": "",
+        "x": 1020,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "eae75652e699b65d",
+        "type": "ui_spacer",
+        "z": "e9950fb4a0b9271b",
+        "name": "spacer",
+        "group": "686c4c8ff06d22b8",
+        "order": 11,
+        "width": "1",
+        "height": "1"
+    },
+    {
+        "id": "ba5fd492397e1fcf",
+        "type": "ui_spacer",
+        "z": "e9950fb4a0b9271b",
+        "name": "spacer",
+        "group": "ca2272c3.e8396",
+        "order": 6,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "686c4c8ff06d22b8",
+        "type": "ui_group",
+        "name": "Edit parameters",
+        "tab": "78842370d6154d8f",
+        "order": 1,
+        "disp": true,
+        "width": "14",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "25b15afd81919975",
+        "type": "influxdb",
+        "hostname": "131.155.162.230",
+        "port": "8086",
+        "protocol": "http",
+        "database": "mydb",
+        "name": "mydb",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "1.x",
+        "url": "http://131.155.160.236:8086",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "1d0b0ec39b5427ba",
+        "type": "mqtt-broker",
+        "name": "broker.emqx.io",
+        "broker": "broker.emqx.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ca2272c3.e8396",
+        "type": "ui_group",
+        "name": "Other options",
+        "tab": "78842370d6154d8f",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "78842370d6154d8f",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
